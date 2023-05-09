@@ -1,0 +1,9 @@
+{
+    "author": "KostromDan",
+    "description": "Adds a patchouli-esque manual item to create. Requires create",
+    
+    "versions": [9],
+    "modloaders": ["forge", "fabric"],
+    "dependencies": [],
+    "incompatibilities": []
+}
