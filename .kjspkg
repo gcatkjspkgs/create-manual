@@ -4,6 +4,6 @@
     
     "versions": [9],
     "modloaders": ["forge", "fabric"],
-    "dependencies": [],
+    "dependencies": ["mod:create", "mod:kubejsadditions"],
     "incompatibilities": []
 }
