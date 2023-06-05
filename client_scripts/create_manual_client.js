@@ -9,7 +9,11 @@ let no_recursion = false
 let ponder_tag_tmp = null
 
 function add_item(ponder_tag, item) {
-    $PonderRegistry.TAGS.forTag(ponder_tag)['add(net.minecraft.resources.ResourceLocation)'](item);
+    if (Platform.isForge()) {
+        $PonderRegistry.TAGS.forTag(ponder_tag)['add(net.minecraft.resources.ResourceLocation)'](item);
+    }else {
+        $PonderRegistry.TAGS.forTag(ponder_tag).add(item);
+    }
 }
 
 function get_pivate_field(cls, field) {
@@ -19,7 +23,7 @@ function get_pivate_field(cls, field) {
 }
 
 function remove_ponder_tag(ponder_tag) {
-    let tags = get_pivate_field($PonderRegistry.TAGS,'tags') // 'tags' is a private field of the PonderTagRegistry class that has no public deletion methods.
+    let tags = get_pivate_field($PonderRegistry.TAGS, 'tags') // 'tags' is a private field of the PonderTagRegistry class that has no public deletion methods.
     for (const x of tags.entries()) {
         if (x.getValue() == ponder_tag) {
             tags.remove(x.getKey(), x.getValue())
@@ -61,13 +65,7 @@ NetworkEvents.fromServer('openPonderTagIndexScreen', event => {
 })
 
 ItemEvents.tooltip(tooltip => {
-    let text = null
-    if (Platform.isForge()) {
-        text = "Shift + scroll to change screen mode!"
-    } else {
-        text = 'Use "/create_manual_config page_type <...>" to change screen mode!'
-    }
-    let myMessage = Text.yellow(`Right click to item from create, you want to get help, or non create to open page with all items. Works up to 64 blocks! ${text}`)
+    let myMessage = Text.yellow(`Right click to item from create, you want to get help, or non create to open page with all items. Works up to 64 blocks! Shift + scroll to change screen mode!`)
     tooltip.add('create:create_manual', [myMessage])
 })
 
