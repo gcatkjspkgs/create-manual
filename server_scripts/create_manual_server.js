@@ -48,9 +48,7 @@ function create_manual_right_click(event) {
         ponder = ponder.get("ponder")
         if (!event.player.stages.has('notified_about_create_manual_options')) {
             event.player.stages.add('notified_about_create_manual_options')
-            if (Platform.isForge()) {
-                event.player.tell("Shift + scroll if you want to change screen mode!")
-            }
+            event.player.tell("Shift + scroll if you want to change screen mode or click on the block from Create for which you want to get help.")
         }
         if (ray.block !== null && !event.player.isCrouching()) {
             let ponders = []
@@ -68,6 +66,9 @@ function create_manual_right_click(event) {
                 if (ponder.contains(drop.id) && !ponders.includes(drop.id)) {
                     ponders.push(drop.id)
                 }
+            }
+            if (ponders.includes('create:vertical_gearbox') && ponders.includes('create:gearbox')) {
+                ponders = ponders.filter((el) => el !== 'create:gearbox');
             }
 
             if (ponders.length == 1) {

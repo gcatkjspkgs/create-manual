@@ -1,5 +1,4 @@
 if (Platform.isClientEnvironment()) {
-    Java.loadClass("pie.ilikepiefoo.events.AdditionalEvents").register(); //Force load of ArchEvents to fabric version work correct.
     let CLIENTRAWINPUTEVENT = Java.loadClass('dev.architectury.event.events.client.ClientRawInputEvent');
     let RESULT = Java.loadClass("dev.architectury.event.EventResult");
 
@@ -14,7 +13,7 @@ if (Platform.isClientEnvironment()) {
             event.setResult(RESULT.interruptFalse()) //Cancel event.
             return;
         }
-        event.setResult(RESULT.interruptTrue()) //Don't cancel event.
+        event.setResult(RESULT.pass()) //Don't cancel event.
     })
 }
 
