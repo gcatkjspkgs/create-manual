@@ -56,7 +56,7 @@ function create_manual_right_click(event) {
                 ponders.push('create:andesite_casing')
             } else if (ray.block.id.includes('brass_encased')) {
                 ponders.push('create:brass_casing')
-            } else if (ray.block.id.includes('encased')) {
+            } else if (ray.block.id.includes('encased') && ray.block.id.includes('fluid')) {
                 ponders.push('create:copper_casing')
             }
             if (ponder.contains(ray.block.id)) {
@@ -109,4 +109,8 @@ NetworkEvents.fromClient('create_manual_change_screen', event => {
     }
     event.player.persistentData.create_manual_page_type = screen
     event.server.runCommandSilent(`title ${event.player.username} actionbar "Now manual will open ${screen}!"`)
+})
+
+ServerEvents.recipes(event => {
+    event.shapeless('create:create_manual', ['minecraft:book', 'create:andesite_alloy'])
 })

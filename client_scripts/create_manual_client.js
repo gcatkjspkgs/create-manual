@@ -3,27 +3,30 @@ const $PonderTagIndexScreen = Java.loadClass('com.simibubi.create.foundation.pon
 const $PonderTagScreen = Java.loadClass('com.simibubi.create.foundation.ponder.ui.PonderTagScreen')
 const $Create = Java.loadClass('com.simibubi.create.Create')
 const $AllItems = Java.loadClass('com.simibubi.create.AllItems')
+const $ScreenOpener = Java.loadClass('com.simibubi.create.foundation.gui.ScreenOpener')
+const $PauseScreen = Java.loadClass('net.minecraft.client.gui.screens.PauseScreen')
 
-let check_ponder_closed = false
-let no_recursion = false
+let check_ponder_tag_closed = false
+let check_ponder_index_closed = false
+let no_recursion_create_manual = false
 let ponder_tag_tmp = null
 
 function add_item(ponder_tag, item) {
     if (Platform.isForge()) {
         $PonderRegistry.TAGS.forTag(ponder_tag)['add(net.minecraft.resources.ResourceLocation)'](item);
-    }else {
+    } else {
         $PonderRegistry.TAGS.forTag(ponder_tag).add(item);
     }
 }
 
-function get_pivate_field(cls, field) {
+function get_private_field(cls, field) {
     let cls_field = cls.class.getDeclaredField(field);
     cls_field.setAccessible(true)
     return cls_field.get(cls);
 }
 
 function remove_ponder_tag(ponder_tag) {
-    let tags = get_pivate_field($PonderRegistry.TAGS, 'tags') // 'tags' is a private field of the PonderTagRegistry class that has no public deletion methods.
+    let tags = get_private_field($PonderRegistry.TAGS, 'tags') // 'tags' is a private field of the PonderTagRegistry class that has no public deletion methods.
     for (const x of tags.entries()) {
         if (x.getValue() == ponder_tag) {
             tags.remove(x.getKey(), x.getValue())
@@ -43,25 +46,33 @@ NetworkEvents.fromServer('open_multi_ponder', event => {
     let screen = new $PonderTagScreen(ponder_tag)
     Client.setCurrentScreen(screen)
 
-    check_ponder_closed = true
+    check_ponder_tag_closed = true
     ponder_tag_tmp = ponder_tag
 })
 
 ClientEvents.tick(event => {
-    if (no_recursion) {
+    if (no_recursion_create_manual) {
         return;
     }
-    no_recursion = true
-    if (check_ponder_closed && Client.currentScreen == null) {
+    no_recursion_create_manual = true
+
+    if (check_ponder_tag_closed && Client.currentScreen == null) {
         remove_ponder_tag(ponder_tag_tmp)
-        check_ponder_closed = false
+        check_ponder_tag_closed = false
     }
-    no_recursion = false
+    if (check_ponder_index_closed && (Client.currentScreen instanceof $PauseScreen || Client.currentScreen == null)) {
+        check_ponder_index_closed = false
+        Client.setCurrentScreen(null)
+    }
+
+    no_recursion_create_manual = false
 })
 
 NetworkEvents.fromServer('openPonderTagIndexScreen', event => {
     let screen = new $PonderTagIndexScreen()
-    Client.setCurrentScreen(screen)
+    Client.setCurrentScreen($PauseScreen(true)) //A workaround that allows exit button to work correctly again.
+    $ScreenOpener.open(screen)
+    check_ponder_index_closed = true
 })
 
 ItemEvents.tooltip(tooltip => {
